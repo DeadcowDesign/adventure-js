@@ -1,0 +1,13 @@
+{
+  "room001": {
+    "description": [
+      "Welcome to the JS Adventure Game System.",
+      " ",
+      "Load a game by typing 'load' followed by the name of the game you wish to load, e.g. load the maze of zandar",
+      "",
+      "Available games are:",
+      "The Maze of Zandar",
+      "Robots From Mars"
+    ]
+  }
+}

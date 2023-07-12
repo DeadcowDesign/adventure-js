@@ -1,0 +1,30 @@
+{
+  "room001": {
+    "oneShot": [
+      "Your eyes slowly focus as you awaken, your head pounding, blood rushing through your ears.",
+      "You struggle to recolect the events leading up to this point."
+    ],
+    "description": [
+      "The loud hum of electrical machinery is"
+    ],
+    "oneShotPlayed": false,
+    "exits": [
+      {
+        "name": "NORTH",
+        "destination": "room002",
+        "description": "An organic looking corridor snakes away from you to the 'north', curving out of sight."
+      },
+      {
+        "name": "SOUTH",
+        "locked": false,
+        "destination": "room003",
+        "description": "Behind you, to the south, are rolling fields and the way back home."
+      }
+    ]
+  },
+  "room002": {
+    "description": [
+      ""
+    ]
+  }
+}

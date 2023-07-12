@@ -1,358 +1,527 @@
-const inputBar = document.getElementById("input-bar");
-const inputForm = document.getElementById("input");
+import { UI } from './ui.js';
 
-import rooms from './rooms.json' assert {type: 'json'};
-import itemList from './items.json' assert {type: 'json'};
+class Adventure {
+    constructor(gameName, inputBarId, outputDivId, titleId, statusBarId) {
 
-import * as ui from './ui.js';
+        this.roomFile = "";
+        this.itemFile = "";
+        this.gameMeta = "";
+        this.playerFile = "";
+        // Most important - name of the game folder!
+        this.gameName = gameName;
 
-let command = "";
-let currentRoom = "room001";
-let commandArray = [];
+        this.rooms = {}; // The object that will hold the room data.
+        this.itemList = {};  // The object that will hold the items.
+        this.gameMeta = {}; // The object that will hold the game metadata.
+        this.player = {};
 
-const verbs = [
-    "GO",
-    "TAKE",
-    "ON",
-    "WITH",
-    "ON",
-];
+        this.commandArray = [];  // The array of commands from the UI.
 
+        // Dictionary definitions for valid command words
+        this.verbs = [
+            "GO",
+            "TAKE",
+            "DROP",
+            "INVENTORY",
+            "USE",
+            "LOOK",
+            "ON",
+            "WITH",
+            "FROM",
+            "LOAD",
+        ];
 
-inputForm.addEventListener("submit", (e) => {
-    e.preventDefault();
-    getCommand();
-});
+        this.ui = new UI(inputBarId, outputDivId, titleId, statusBarId);
 
-function getCommand()
-{
-    command = inputBar.value.toUpperCase();
-    ui.println(command);
-    inputBar.value = "";
-    tokenizeCommand();
-}
-
-function tokenizeCommand()
-{
-    let commandParts = command.split(" ");
-
-    commandArray = [];
-
-    commandArray.push(commandParts.shift());
-
-    let verbString = "";
-
-    let processing = true;
-    while (processing === true) {
-
-        let token = commandParts.shift();
-        if (verbs.indexOf(token) === -1) {
-            verbString += " " + token;
-        } else {
-            commandArray.push(verbString.trim());
-            verbString = "";
-            commandArray.push(token);
-        }
-
-        if (!commandParts.length) {
-            if (verbString.length) {
-                commandArray.push(verbString.trim());
-            }
-            processing = false;
-        }
-    }
-
-    if (commandArray[0] === "HELP") {
-        ui.println(["List of commands:",
-        "GO: move to a location e.g. 'GO NORTH'",
-        "LOOK: examine an item, e.g. 'LOOK CHEST'",
-        "TAKE: take an item from the room, e.g. 'TAKE BUCKET OF DESTINY'",
-        "INVENTORY: show what you are currently carrying"]);
-        
-        return;
-    }
-
-    switch(commandArray[0]) {
-        case 'GO':
-            doGo();
-            break;
-        case 'TAKE':
-            doTake();
-            break;
-        case 'DROP':
-            doDrop();
-            break;
-        case 'INVENTORY':
-            doInventory();
-            break;
-        case 'USE':
-            doUse();
-            break;
-        case "LOOK":
-            doLook();
-            break;
-        case 'DEBUG':
-            doDebug();
-            break;
-    }
-}
-
-/**
- * describeRoom - write a room description. Uses the rooms list and the descriptio field
- * for the initial text. Compiles a list of objects which are in the room
- */
-function describeRoom()
-{
-    ui.clearscreen();
-    ui.println(rooms[currentRoom].description);
-
-    let roomItems = getRoomInventory();
-
-    if (roomItems.length) {
-        ui.println(["In the room, you can see:"]);
-
-        let itemNames = [];
-
-        roomItems.forEach(item => {
-            itemNames.push(item);
+        window.addEventListener("inputupdate", (ev) => {
+            this.processCommand(ev.detail);
         });
 
-        ui.printlist(itemNames);
+        this.main();
+
     }
 
-    if (typeof(rooms[currentRoom].exits) != null && rooms[currentRoom].exits.length) { 
-            rooms[currentRoom].exits.forEach((exit) => {
+    // Load the files and start the game.
+    main() {
+        // JSON files for game data. All must be indcluded.
+        this.roomFile = `./${this.gameName}/rooms.json`;
+        this.itemFile = `./${this.gameName}/items.json`;
+        this.gameMetaFile = `./${this.gameName}/meta.json`;
+        this.playerFile = `./${this.gameName}/player.json`;
+
+        this.rooms = JSON.parse(localStorage.getItem(this.gameName + "-rooms"));
+        this.itemList = JSON.parse(localStorage.getItem(this.gameName + "-items"));
+        this.gameMeta = JSON.parse(localStorage.getItem(this.gameName + "-meta"));
+        this.player = JSON.parse(localStorage.getItem(this.gameName + "-player"));
+
+        // Get all the game data from the game folder (specified above).
+        fetch(this.roomFile)
+            .then((response) => response.json())
+            .then((json) => {
+                if (this.rooms == null) {
+                    this.rooms = json;
+                }
+                fetch(this.itemFile)
+                    .then((response) => response.json())
+                    .then((json) => {
+                        if (this.itemList == null) {
+                            this.itemList = json;
+                        }
+                        fetch(this.gameMetaFile)
+                            .then((response) => response.json())
+                            .then((json) => {
+                                if (this.gameMeta == null) {
+                                    this.gameMeta = json;
+                                }
+                                fetch(this.playerFile)
+                                    .then((response) => response.json())
+                                    .then((json) => {
+                                        if (this.player == null) {
+                                            this.player = json;
+                                        }
+                                        // This is where we do the thing.
+                                        this.configureGame();
+                                    })
+                            })
+                    })
+            });
+
+    }
+
+    /**
+     * configureGame 
+     * Do game configuration stuff here, like setting initial room, title, player
+     * stats, plus whatever else. This is the first thing to run when all the
+     * game resources have loaded in.
+     */
+    configureGame() {
+
+        this.ui.setTitle(this.gameMeta.title);
+        this.updatePlayerStatusBar();
+        this.describeRoom();
+    }
+
+    saveGameData() {
+        localStorage.setItem(this.gameName + '-rooms', JSON.stringify(this.rooms));
+        localStorage.setItem(this.gameName + '-items', JSON.stringify(this.itemList));
+        localStorage.setItem(this.gameName + '-player', JSON.stringify(this.player));
+    }
+
+    /**
+     * processCommand - runs on inputupdate (from the UI, when the player
+     * submits the form). This is really the main game loop:
+     * Get input -> parse into commands -> action commands
+     * @param {string} rawCommand The input from the UI
+     */
+    processCommand(rawCommand) {
+        rawCommand = rawCommand.toUpperCase();
+
+        this.ui.println([rawCommand]);
+        this.tokenizeCommand(rawCommand);
+
+        if (!this.gameMeta.verbs[this.commandArray[0]]) {
+            this.ui.println("I don't understand. Try something else, or use help.");
+        } else {
+            this[this.gameMeta.verbs[this.commandArray[0]]]();
+        }
+    }
+
+    /**
+     * tokenizeCommand - splits a space-separated string out into parts
+     * and processes them into an array. If an item is not a verb it is
+     * concatenated until we hit a verb, then that string is added to the
+     * array, and the verb is added after. Loops until we run out of words.
+     * @param {string} command The string to be tokenized
+     */
+    tokenizeCommand(command) {
+        this.commandArray = []; // Don't forget to clean.
+        let commandParts = command.split(" ");
+        let verbString = "";
+        let processing = true;
+
+        // First word should always be a command verb.
+        this.commandArray.push(commandParts.shift());
+
+        while (processing === true) {
+
+            let token = commandParts.shift();
+            if (this.verbs.indexOf(token) === -1) {
+
+                verbString += " " + token;
+
+            } else {
+
+                this.commandArray.push(verbString.trim());
+                verbString = "";
+                this.commandArray.push(token);
+            }
+
+            if (!commandParts.length) {
+
+                if (verbString.length) {
+
+                    this.commandArray.push(verbString.trim());
+                }
+
+                processing = false;
+            }
+        }
+    }
+
+    describeRoom() {
+        this.ui.clearscreen();
+
+        if (this.rooms[this.player.currentRoom].oneShot && this.rooms[this.player.currentRoom].oneShotPlayed == false) {
+            this.ui.println(this.rooms[this.player.currentRoom].oneShot);
+            this.rooms[this.player.currentRoom].oneShotPlayed = true;
+        }
+
+        this.ui.println(this.rooms[this.player.currentRoom].description);
+
+        if (typeof (this.rooms[this.player.currentRoom].exits) != 'undefined' && this.rooms[this.player.currentRoom].exits.length) {
+            this.rooms[this.player.currentRoom].exits.forEach((exit) => {
                 if (exit.door) {
-                    let door = getItemById(exit.door);
+                    let door = this.getItemById(exit.door);
                     if (door.isActive) {
-                        ui.println(door.description);
+                        this.ui.println(door.description);
                     } else {
-                        ui.println(exit.description)
+                        this.ui.println(exit.description)
                     }
                 } else {
-                    ui.println(exit.description);
+                    this.ui.println(exit.description);
                 }
             });
+        }
+
+        let roomItems = this.getRoomInventory();
+
+        if (roomItems.length) {
+            this.ui.println(["You can see:"]);
+
+            let itemNames = [];
+
+            roomItems.forEach(item => {
+                itemNames.push(item);
+            });
+
+            this.ui.printlist(itemNames);
+        }
+
     }
-}
 
-// doGo, transition from one room to another. Changes the currentRoom variable, but also checks for
-// locked doors which are in the way of hte player.
-// TODO - Move the locked doors stuff into its own function.
-function doGo() {
-    let direction = commandArray[1];
-    let foundRoom = false;
+    getItemById(targetItem) {
 
-    rooms[currentRoom].exits.forEach((exit) => {
-
-        if (exit.name === direction) {
-            foundRoom = true;
-            if (exit.door) {
-                let door = getItemById(exit.door);
-                if (door.locked) {
-                    ui.println(door.description);
-                } else {
-                    currentRoom = exit.destination;
-                    describeRoom();
+        for (let [id, item] of Object.entries(this.itemList)) {
+            if (id === targetItem) {
+                if (item.isActive) {
+                    return item;
                 }
+            }
+        }
+
+        return "";
+    }
+
+    getItemIdByName(targetItem) {
+        for (let [id, item] of Object.entries(this.itemList)) {
+            if (item.name === targetItem) {
+                if (item.isActive) {
+                    return id;
+                }
+            }
+        }
+
+        return "";
+    }
+
+    getRoomInventory() {
+        var roomInventory = [];
+
+        for (let [index, item] of Object.entries(this.itemList)) {
+            if (item.location === this.player.currentRoom && !item.isDoor && item.isActive) {
+                roomInventory.push(item.name);
+            }
+        }
+
+        return roomInventory;
+    }
+
+    getRoomExitsByName(exitString) {
+        for (let exit of this.rooms[this.player.currentRoom].exits) {
+            if (exit.name === exitString) {
+                return exit;
+            }
+        }
+
+        return false;
+    }
+
+    getPlayerInventory() {
+        var playerInventory = [];
+
+        for (let [index, item] of Object.entries(this.itemList)) {
+            if (item.location === "playerInventory" && item.isActive) {
+                playerInventory.push(item.name);
+            }
+        }
+
+        return playerInventory;
+    }
+
+    /******************
+     * GAME FUNCTIONS *
+     ******************/
+    go() {
+        let direction = this.commandArray[1];
+        let foundRoom = false;
+
+        this.rooms[this.player.currentRoom].exits.forEach((exit) => {
+
+            if (exit.name === direction) {
+                foundRoom = true;
+                if (exit.door) {
+                    let door = this.getItemById(exit.door);
+                    if (door.isActive) {
+                        this.ui.println(door.description);
+                        return;
+                    } else {
+                        this.player.currentRoom = exit.destination;
+                        this.describeRoom();
+                        this.saveGameData();
+                        return;
+                    }
+                } else {
+                    this.player.currentRoom = exit.destination;
+                    this.describeRoom();
+                    this.saveGameData();
+                    return;
+                }
+            }
+        });
+
+        if (foundRoom) return;
+
+        this.ui.printrandom([
+            "You cannot go that way.",
+            "There is nothing here.",
+            "Try another direction.",
+        ]);
+    }
+
+    take() {
+        let takeTarget = this.commandArray[1];
+        let itemId = this.getItemIdByName(takeTarget);
+
+        if (this.itemList[itemId] && this.itemList[itemId].location == this.player.currentRoom) {
+            if (!this.itemList[itemId].isGrabbable) {
+                this.ui.println("You cannot pick that up.")
+            } else if (this.itemList[itemId].useOnPickup) {
+                this.commandArray = [
+                    "USE",
+                    takeTarget,
+                    "ON",
+                    "PLAYER"
+                ];
+
+                this.use();
             } else {
-                currentRoom = exit.destination;
-                describeRoom();
+                this.itemList[itemId].location = "playerInventory";
+                this.saveGameData();
+                this.describeRoom();
             }
-        }
-    });
-
-    if (foundRoom) return;
-
-    ui.printrandom([
-        "You cannot go that way.",
-        "There is nothing here.",
-        "Try another direction.",
-    ]);
-}
-
-// doTake, transfer an object to the player inventory. Items in the player's inventory are
-// just items tagged with the 'playerInventory' location.
-function doTake() {
-    let takeTarget = commandArray[1];
-    let itemId = getItemIdByName(takeTarget);
-    console.log(itemId);
-
-    if (itemList[itemId] && itemList[itemId].location == currentRoom) {
-        if (!itemList[itemId].isGrabbable) {
-            ui.println("You cannot pick that up.")
         } else {
-            itemList[itemId].location = "playerInventory";
-            describeRoom();
+
+            this.ui.printrandom([
+                "You cannot take what is not there.",
+                "You can't see that anywhere",
+            ]);
         }
-    } else {
-
-        ui.printrandom([
-            "You cannot take what is not there.",
-            "You can't see that anywhere",
-        ]);
-    }
-}
-
-// doDrop - drop an item from the player inventory. Items in rooms are just items
-// tagged with the current room id in their location.
-function doDrop() {
-    let dropTarget = commandArray[1];
-    let itemId = getItemIdByName(dropTarget);
-
-    if (itemList[itemId] && itemList[itemId].location == "playerInventory") {
-        itemList[itemId].location = currentRoom;
-        describeRoom();
-    }
-}
-
-function doLook(){
-    if (typeof(commandArray[1]) == 'undefined' || typeof(commandArray[1] == null)) {
-        describeRoom();
-    }
-}
-
-// 
-function doInventory() {
-    let inventory = getPlayerInventory();
-
-    if (inventory.length) {
-        ui.printlist(inventory);
-    } else {
-        ui.println("Your pockets are empty");
-    }
-}
-
-/**
- * doUse - run the "use" command. The use command has four parameters:
- * The first verb, which is always 'use'
- * The 'object' - the item the player is using
- * The second verb, which can be something like 'on' or 'with' - we don't really care what this is as long as it's valid
- * The 'subject' - the thing the item is being used on
- * 
- * Rules for items are:
- *  - An item can only be used once (they are deactivated automatically after use)
- *  - An object and subject must be in the same room (either in the room or in the player inventory)
- * 
- * In theory, you could break both of these rules, but bad things would happen if you did.
- * @returns false
- */
-function doUse()
-{    
-    /* 
-        Check if the user has supplied an 'on' and a 'subject' - e.g.
-        "use key on door"
-        TODO - Tidy this up and check for valid use nouns ('on', 'with' etc)
-    */
-    if (!commandArray[2] || !commandArray[3]) {
-        ui.println(["You must use 'something' on or with 'something'"]);
     }
 
-    let object = getItemIdByName(commandArray[1]);
-    let subject = getItemIdByName(commandArray[3]);
+    drop() {
+        let dropTarget = this.commandArray[1];
+        let itemId = this.getItemIdByName(dropTarget);
 
-    // Check that these are valid items.
-    if (!itemList[subject] || !itemList[object]) {
-        ui.println("You cannot do that.");
-        return;
+        if (this.itemList[itemId] && this.itemList[itemId].location == "playerInventory") {
+            this.itemList[itemId].location = this.player.currentRoom;
+            this.saveGameData();
+            this.describeRoom();
+        }
     }
 
-    // Make sure that the object is either in the room, or on the player.
-    if (itemList[object].location !== "playerInventory" && itemList[object].location !== currentRoom) {
-        ui.println("You do not have that.")
-        return;
-    }
-    
-    // Make sure that the subject is either in the room, or on the player.
-    if (itemList[subject].location !== "playerInventory" && itemList[subject].location !== currentRoom) {
-        ui.println("You do not have that.")
-        return;
-    }
+    look() {
+        if (this.commandArray[1] == 'undefined' || typeof (this.commandArray[1]) == null) {
+            this.describeRoom();
+            return;
+        }
 
-    // Make sure we can actually use the object with the subject
-    if (itemList[object]['use'][target] !== subject) {
-        ui.printrandom([
-            ["You cannot use that."]
-        ]);
+        let exit = this.getRoomExitsByName(this.commandArray[1]);
+
+        if (exit) {
+
+            this.ui.println(exit.description);
+            return;
+        }
+
+
+        let target = this.getItemIdByName(this.commandArray[1]);
+
+        if (target && (this.itemList[target].location == this.player.currentRoom || this.itemList[target].location == "playerInventory")) {
+            this.ui.println(this.itemList[target].description);
+        } else {
+            this.ui.println("You cannot see that.");
+        }
 
         return;
     }
 
-    /*
-    Every object in the game can have a set of 'mutations'. A mutation represents the items effect on
-    another item in the game. For example, to open a door you would set the door's isActive state to false,
-    but any property can be modified (as long as it is in the top tier of the object's properties).
-    */
-    for(let [itemId, mutations] of Object.entries(itemList[object]["use"])) {
+
+    help() {
+        this.ui.println(this.gameMeta.helpText);
+    }
+
+    inventory() {
+        let inventory = this.getPlayerInventory();
+        if (!inventory.length) {
+            this.ui.println(["Your pockets are empty"]);
+        } else {
+            this.ui.println(["You are carrying:"]);
+            this.ui.printlist(inventory);
+        }
+    }
+
+    use() {
+        /* 
+            Check if the user has supplied an 'on' and a 'subject' - e.g.
+            "use key on door"
+            TODO - Tidy this up and check for valid use nouns ('on', 'with' etc)
+        */
+        if (!this.commandArray[2] || !this.commandArray[3]) {
+            this.ui.println(["You must use 'something' on or with 'something'"]);
+        }
+
+        let object = this.getItemIdByName(this.commandArray[1]);
+        let subject = this.commandArray[3];
+
+        if (subject !== "PLAYER") {
+
+            subject = this.getItemIdByName(this.commandArray[3]);
+
+        } else {
+
+            if (!this.itemList[object]) {
+                this.ui.println("You cannot do that. (player)")
+            }
+
+            // Make sure that the object is either in the room, or on the player.
+            if (this.itemList[object].location !== "playerInventory"
+                && this.itemList[object].location !== this.player.currentRoom
+            ) {
+                this.ui.println("You do not have that.")
+                return;
+            }
+
+            for (let [item, mutations] of Object.entries(this.itemList[object].use.mutations)) {
+
+                for (let [prop, val] of Object.entries(mutations)) {
+                    console.log(val);
+                    if (val.hasOwnProperty("set")) {
+                        this.player[prop] = val["set"];
+                    } else if (val.hasOwnProperty("increase")) {
+                        this.player[prop] += val["increase"];
+                    } else if (val.hasOwnProperty("decrease")) {
+                        this.player[prop] -= val["decrease"];
+                    }
+                }
+            }
+
+            this.itemList[object].isActive = false;
+            this.ui.println(this.itemList[object].use.description);
+            this.saveGameData();
+            this.updatePlayerStatusBar();
+
+            return;
+        }
+
+        // Check that these are valid items.
+        if (!this.itemList[subject] || !this.itemList[object]) {
+            this.ui.println("You cannot do that.");
+            return;
+        }
+
+        // Make sure that the object is either in the room, or on the player.
+        if (this.itemList[object].location !== "playerInventory"
+            && this.itemList[object].location !== this.player.currentRoom
+        ) {
+            this.ui.println("You do not have that.")
+            return;
+        }
+
+        // Make sure that the subject is either in the room, or on the player.
+        if (this.itemList[subject].location !== "playerInventory"
+            && this.itemList[subject].location !== this.player.currentRoom
+        ) {
+            this.ui.println("You do not have that.")
+            return;
+        }
+
+        // Make sure we can actually use the object with the subject
+        if (!this.itemList[object].use.subject === subject) {
+            this.ui.printrandom([
+                ["You cannot use those together."]
+            ]);
+
+            return;
+        }
+
+        for (let [item, mutations] of Object.entries(this.itemList[object].use.mutations)) {
+            if (!this.itemList[item]) {
+                this.ui.println("You do not have that");
+                continue;
+            }
+
+            for (let [prop, val] of Object.entries(mutations)) {
+                if (val.hasOwnProperty("set")) {
+                    this.itemList[subject][prop] = val["set"];
+                } else if (val.hasOwnProperty("increase")) {
+                    this.itemList[subject][prop] += val["increase"];
+                } else if (val.hasOwnProperty("decrease")) {
+                    this.itemList[subject][prop] -= val["decrease"];
+                }
+            }
+        }
+
+        this.itemList[object].isActive = false;
+
+        this.ui.println(this.itemList[object].use.description);
+        this.saveGameData();
+    }
+
+    load() {
+        if (this.commandArray[1] == 'undefined' || typeof (this.commandArray[1]) == null) {
+            return false;
+        } else {
+            this.gameName = this.commandArray[1].toLowerCase();
+            this.gameName = this.gameName.replace(/\s/g, "-");
+            this.main();
+        }
+    }
+
+    updatePlayerStatusBar() {
+
+        if (!this.player.statusBar) {
+            return false;
+        }
         
-        for (let [prop, val] of Object.entries(itemList[object]["use"][mutations][itemId])) {
-            itemList[itemId][prop] = val;
-        }
+        let statusBarString = "";
+
+        this.player.statusBar.forEach(stat => {
+
+            statusBarString += `${stat}: ${this.player[stat]} `;
+        });
+
+        this.ui.setStatusBar(statusBarString);
     }
 }
 
-function getItemIdByName(targetItem) {
-
-    for (let [id, item] of Object.entries(itemList)) {
-        if (item.name === targetItem) {
-            if (item.isActive) {
-                return id;
-            }
-        }
-    }
-
-    return "";
-}
-
-function getItemById(targetItem) {
-
-    for (let [id, item] of Object.entries(itemList)) {
-        if (id === targetItem) {
-            if (item.isActive) {
-                return item;
-            }
-        }
-    }
-
-    return "";
-}
-
-function getRoomInventory()
-{
-    var roomInventory = [];
-
-    for (let [index, item] of Object.entries(itemList))
-    {
-        if (item.location === currentRoom && !item.isDoor && item.isActive) {
-            roomInventory.push(item.description);
-        }
-    }
-
-    return roomInventory;
-}
-
-function getPlayerInventory()
-{
-    var playerInventory = [];
-
-    for (let [index, item] of Object.entries(itemList))
-    {
-        if (item.location === "playerInventory" && item.isActive) {
-            playerInventory.push(item.name);
-        }
-    }
-
-    return playerInventory;
-}
-
-function doDebug()
-{
-    logList();
-}
-
-function logList()
-{
-    console.log(itemList);
-}
-
-describeRoom(currentRoom, []);
+export { Adventure };

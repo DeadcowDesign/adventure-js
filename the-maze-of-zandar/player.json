@@ -1,0 +1,7 @@
+{
+    "currentRoom": "room001",
+    "inventoryLimit": 5,
+    "hp": 999,
+    "gold": 0,
+    "statusBar": ["hp", "gold"]
+}

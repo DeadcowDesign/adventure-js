@@ -1,0 +1,74 @@
+{
+  "small_pouch": {
+    "name": "SMALL POUCH",
+    "location": "room001",
+    "description": [
+      "A small leather pouch has been placed on the ground in the centre of the room. The cracked leather is slightly open at the neck, and within you can see the telltale glint of gold coins."
+    ],
+ 
+    "isActive": true,
+    "isGrabbable": true,
+    "useOnPickup": true,
+    "use": {
+      "subject": "player",
+      "description": [
+        "As you grab the pouch sharp spikes shoot from it's leather surface and pierce your skin before retracting.",
+        "You are slightly richer, and somewhat wiser, but also less healthy. You make a mental note that if something in the maze looks too good to be true, it probably is."
+      ],
+      "mutations": {
+        "player": {
+          "gold": {
+            "increase": 10
+          },
+          "hp": {
+            "decrease": 25
+          }
+        }
+      }
+    }
+  },
+  "entrance_statue": {
+    "name": "STATUE",
+    "location": "room001",
+    "description": [
+      "The huge statue of Zandar must measure ten meters tall at least, his arms splayed wide, gown blowing in an eternal gale, staff in one hand, open grimoire in the other, as he shouts to the heavens. He is an imposing figure, slight though he is, with sharp features and a long, narrow beard that reaches down to his sternum.",
+      "",
+      "Time has buffeted the statue, it's surfaces are thick with moss, vines climbing its cracked exterior"
+    ],
+    "isGrabbable": false,
+    "isActive": true
+  },
+  "iron_door": {
+    "name": "IRON DOOR",
+    "description": "A heavy iron door with an intricate keyhole blocks your path to the 'NORTH'.",
+    "isGrabbable": false,
+    "isDoor": true,
+    "isActive": true,
+    "location": "room001"
+  },
+  "dungeon_key": {
+    "name": "ZANDAR'S KEY",
+    "description": [
+      "An ancient, rusty, key. It's surface is worn and pitted. There seems to be dried blood smeared on the handle."
+    ],
+    "isGrabbable": true,
+    "destroyOnUse": true,
+    "used": false,
+    "isActive": true,
+    "location": "playerInventory",
+    "use": {
+      "subject": "iron_door",
+      "description": [
+        "You push the key into the lock and turn it. Within the bowels of the labryinth you can hear ancient mechanisms creak into life.",
+        "With a screech like nails down a blackboard the heavy iron door slowly swings open."
+      ],
+      "mutations": {
+        "iron_door": {
+          "isActive": {
+            "set": false
+          }
+        }
+      }
+    }
+  }
+}

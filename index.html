@@ -6,13 +6,11 @@
     <title>Document</title>
     <link rel="stylesheet" href="styles.css">
 </head>
-<body class="green-1 background">
+<body class="green-1 background glow">
     <div class="terminal">
-        <header> 
-            <h1>THE MAZE OF ZANDAR</h1>
-            <div id="status-bar">
-                HP:<span id="hitpoints">999</span>
-                Gold:<span id="gold">1000</span>
+        <header id="ui-header"> 
+            <h1 id="title"></h1>
+            <div class="status-bar" id="status-bar">
             </div>
        </header>
         <div class="output-wrapper">
@@ -23,6 +21,17 @@
             <input type="text" class="input-bar" id="input-bar" autocomplete="disabled">
         </form>
     </div>
-    <script src="./adventure.js" type="module"></script>
+    <script type="module">
+        import {Adventure} from './adventure.js';
+        new Adventure(
+            'the-maze-of-zandar', 
+            'input-bar', 
+            'output', 
+            'title', 
+            'status-bar'
+        );
+
+
+    </script>
 </body>
 </html>

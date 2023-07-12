@@ -270,6 +270,7 @@ header {
     border-bottom: var(--border);
     column-gap: 12px;
     align-items: center;
+    padding: var(--half-size) 0;
 }
 
 header h1 {
@@ -280,9 +281,14 @@ header h1 {
 header p {
     margin:0;
 }
+
+header .status-bar {
+    text-align: right;
+}
 .output-wrapper {
     position: relative;
     overflow-y: scroll;
+    padding-top: var(--half-size);
 }
 
 .output-wrapper::-webkit-scrollbar {

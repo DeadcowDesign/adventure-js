@@ -1,0 +1,46 @@
+{
+  "room001": {
+    "oneShot": [
+      "You reflect on your long and arduous journey as you kick over the ashes of your campfire. A chance meeting in a tavern with a wandering stranger, idle talk of the great sorcerer Zandar and his labrynthian fortress filled with traps, foes, and treasure. At it's heart, a prize beyond reckoning, a single wish, crystalized and made form. Anything the mind could concieve or the heart could dream waiting for the one brave and clever enough to claim it."
+    ],
+    "oneShotPlayed": false,
+    "description": [
+      "You are standing at the entrance to Zanbar's labyrith. It's vast, grey, walls tower above you casting everything into shade disappearing as far as the eye can see in both directions."
+    ],
+    "exits": [
+      {
+        "name": "NORTH",
+        "door": "iron_door",
+        "destination": "room002",
+        "description": "The yawing mouth of the maze is before you. The air as black an thick as tar."
+      },
+      {
+        "name": "SOUTH",
+        "locked": false,
+        "destination": "room003",
+        "description": "Behind you, to the south, are rolling fields and the way back home."
+      }
+    ]
+  },
+  "room002": {
+    "description": [
+      "You have escaped Zandar's wrath!"
+      ],
+    "roomInventory": [],
+    "exits": []
+  },
+  "room003": {
+    "description": [
+      "You turn to face the setting sun, your fight will wait for another day."
+    ],
+    "roomInventory": [],
+    "exits": [
+      {
+        "name": "NORTH",
+        "destination": "room001",
+        "description": "To the north of you is the intimidating castle zanbar.",
+        "locked": false
+      }
+    ]
+  }
+}
