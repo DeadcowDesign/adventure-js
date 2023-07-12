@@ -1,7 +1,11 @@
 {
-    "currentRoom": "room001",
+    "currentRoom": "courtyard",
     "inventoryLimit": 5,
     "hp": 999,
     "gold": 0,
-    "statusBar": ["hp", "gold"]
+    "statusBar": {
+        "hp": "Hit Points",
+        "gold": "Gold",
+        "inventoryLimit": "Inventory space"
+    }
 }

@@ -268,6 +268,14 @@ class Adventure {
         return playerInventory;
     }
 
+    getInventorySpace() {
+        if (!this.player.inventoryLimit) {
+            return -1;
+        }
+
+        return this.player.inventoryLimit - this.getPlayerInventory().length;
+    }
+
     /******************
      * GAME FUNCTIONS *
      ******************/
@@ -313,8 +321,11 @@ class Adventure {
         let itemId = this.getItemIdByName(takeTarget);
 
         if (this.itemList[itemId] && this.itemList[itemId].location == this.player.currentRoom) {
+            
             if (!this.itemList[itemId].isGrabbable) {
-                this.ui.println("You cannot pick that up.")
+                
+                this.ui.println("You cannot pick that up.");
+
             } else if (this.itemList[itemId].useOnPickup) {
                 this.commandArray = [
                     "USE",
@@ -324,11 +335,29 @@ class Adventure {
                 ];
 
                 this.use();
+
             } else {
-                this.itemList[itemId].location = "playerInventory";
-                this.saveGameData();
-                this.describeRoom();
+
+                if (!this.getInventorySpace === -1) {
+                    this.itemList[itemId].location = "playerInventory";
+                } else if (this.getInventorySpace() > 0) {
+                    if (this.itemList[itemId].take?.description) {
+                        this.ui.println(this.itemList[itemId].take.description);
+                    }
+                    this.itemList[itemId].location = "playerInventory";
+                    this.saveGameData();
+                    //this.describeRoom();
+
+                } else {
+                    this.ui.println("You do not have space to carry that.");
+                }
+
             }
+
+            if (this.itemList[itemId].take?.mutations) {
+                this.doMutations(this.itemList[itemId].take.mutations);
+            }
+
         } else {
 
             this.ui.printrandom([
@@ -346,6 +375,7 @@ class Adventure {
             this.itemList[itemId].location = this.player.currentRoom;
             this.saveGameData();
             this.describeRoom();
+            this.updatePlayerStatusBar();
         }
     }
 
@@ -368,6 +398,10 @@ class Adventure {
 
         if (target && (this.itemList[target].location == this.player.currentRoom || this.itemList[target].location == "playerInventory")) {
             this.ui.println(this.itemList[target].description);
+            if (this.itemList[target].look?.mutations) {
+                this.doMutations(this.itemList[target].look.mutations);
+                this.saveGameData();
+            }
         } else {
             this.ui.println("You cannot see that.");
         }
@@ -420,20 +454,8 @@ class Adventure {
                 this.ui.println("You do not have that.")
                 return;
             }
+            this.doMutations(this.itemList[object].use.mutations);
 
-            for (let [item, mutations] of Object.entries(this.itemList[object].use.mutations)) {
-
-                for (let [prop, val] of Object.entries(mutations)) {
-                    console.log(val);
-                    if (val.hasOwnProperty("set")) {
-                        this.player[prop] = val["set"];
-                    } else if (val.hasOwnProperty("increase")) {
-                        this.player[prop] += val["increase"];
-                    } else if (val.hasOwnProperty("decrease")) {
-                        this.player[prop] -= val["decrease"];
-                    }
-                }
-            }
 
             this.itemList[object].isActive = false;
             this.ui.println(this.itemList[object].use.description);
@@ -474,22 +496,8 @@ class Adventure {
             return;
         }
 
-        for (let [item, mutations] of Object.entries(this.itemList[object].use.mutations)) {
-            if (!this.itemList[item]) {
-                this.ui.println("You do not have that");
-                continue;
-            }
 
-            for (let [prop, val] of Object.entries(mutations)) {
-                if (val.hasOwnProperty("set")) {
-                    this.itemList[subject][prop] = val["set"];
-                } else if (val.hasOwnProperty("increase")) {
-                    this.itemList[subject][prop] += val["increase"];
-                } else if (val.hasOwnProperty("decrease")) {
-                    this.itemList[subject][prop] -= val["decrease"];
-                }
-            }
-        }
+            this.doMutations(this.itemList[object].use.mutations);
 
         this.itemList[object].isActive = false;
 
@@ -512,16 +520,36 @@ class Adventure {
         if (!this.player.statusBar) {
             return false;
         }
-        
+
         let statusBarString = "";
-
-        this.player.statusBar.forEach(stat => {
-
-            statusBarString += `${stat}: ${this.player[stat]} `;
-        });
+        for (let [property, alias] of Object.entries(this.player.statusBar)) {
+            if (property === "inventoryLimit") {
+                statusBarString += `${alias}: ${this.getInventorySpace()} `;
+            } else {
+                statusBarString += `${alias}: ${this.player[property]} `;
+            }
+        }
 
         this.ui.setStatusBar(statusBarString);
     }
+
+    doMutations(mutationList) {
+        for (let [item, mutations] of Object.entries(mutationList)) {
+            console.log(item);
+            console.log(mutations);
+            for (let [prop, val] of Object.entries(mutations)) {
+                console.log(mutations);
+                if (val.hasOwnProperty("set")) {
+                    this.itemList[item][prop] = val["set"];
+                } else if (val.hasOwnProperty("increase")) {
+                    this.itemList[item][prop] += val["increase"];
+                } else if (val.hasOwnProperty("decrease")) {
+                    this.itemList[item][prop] -= val["decrease"];
+                }
+            }
+        }
+    }
+
 }
 
 export { Adventure };
