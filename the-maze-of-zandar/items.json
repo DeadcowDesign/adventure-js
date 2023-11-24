@@ -45,7 +45,7 @@
         }
     },
     "courtyard_key": {
-        "name": "KEY",
+        "name": "IRON KEY",
         "location": "courtyard",
         "description": [
             "An ancient, rusty, key. It's surface is worn and pitted. There seems to be dried blood smeared on the handle."

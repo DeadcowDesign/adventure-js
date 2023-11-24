@@ -1,8 +1,19 @@
 {
     "currentRoom": "courtyard",
     "inventoryLimit": 5,
-    "hp": 999,
-    "gold": 0,
+    "hp":{
+        "current": 999,
+        "default": 990,
+        "resetOnRest": true
+    },
+    "mp": {
+        "current": 200,
+        "default": 200,
+        "resetOnRest": true
+    },
+    "gold": {
+        "current": 0
+    },
     "statusBar": {
         "hp": "Hit Points",
         "gold": "Gold",

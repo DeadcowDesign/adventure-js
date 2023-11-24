@@ -321,9 +321,9 @@ class Adventure {
         let itemId = this.getItemIdByName(takeTarget);
 
         if (this.itemList[itemId] && this.itemList[itemId].location == this.player.currentRoom) {
-            
+
             if (!this.itemList[itemId].isGrabbable) {
-                
+
                 this.ui.println("You cannot pick that up.");
 
             } else if (this.itemList[itemId].useOnPickup) {
@@ -398,6 +398,7 @@ class Adventure {
 
         if (target && (this.itemList[target].location == this.player.currentRoom || this.itemList[target].location == "playerInventory")) {
             this.ui.println(this.itemList[target].description);
+            this.ui.scrollTo();
             if (this.itemList[target].look?.mutations) {
                 this.doMutations(this.itemList[target].look.mutations);
                 this.saveGameData();
@@ -430,12 +431,12 @@ class Adventure {
             "use key on door"
             TODO - Tidy this up and check for valid use nouns ('on', 'with' etc)
         */
-        if (!this.commandArray[2] || !this.commandArray[3]) {
-            this.ui.println(["You must use 'something' on or with 'something'"]);
-        }
 
         let object = this.getItemIdByName(this.commandArray[1]);
-        let subject = this.commandArray[3];
+
+        // If there is no subject, then we use the object as the subject (e.g. "USE DOOR")
+        // and we use the subject on itself (if available).
+        let subject = !this.commandArray[3] ? this.commandArray[1] : this.commandArray[3];
 
         if (subject !== "PLAYER") {
 
@@ -497,7 +498,7 @@ class Adventure {
         }
 
 
-            this.doMutations(this.itemList[object].use.mutations);
+        this.doMutations(this.itemList[object].use.mutations);
 
         this.itemList[object].isActive = false;
 
@@ -526,7 +527,7 @@ class Adventure {
             if (property === "inventoryLimit") {
                 statusBarString += `${alias}: ${this.getInventorySpace()} `;
             } else {
-                statusBarString += `${alias}: ${this.player[property]} `;
+                statusBarString += `${alias}: ${this.player[property].current} `;
             }
         }
 
@@ -535,16 +536,23 @@ class Adventure {
 
     doMutations(mutationList) {
         for (let [item, mutations] of Object.entries(mutationList)) {
-            console.log(item);
-            console.log(mutations);
             for (let [prop, val] of Object.entries(mutations)) {
-                console.log(mutations);
-                if (val.hasOwnProperty("set")) {
-                    this.itemList[item][prop] = val["set"];
-                } else if (val.hasOwnProperty("increase")) {
-                    this.itemList[item][prop] += val["increase"];
-                } else if (val.hasOwnProperty("decrease")) {
-                    this.itemList[item][prop] -= val["decrease"];
+                if (this.itemList.hasOwn(item)) {
+                    if (val.hasOwnProperty("set")) {
+                        this.itemList[item][prop] = val["set"];
+                    } else if (val.hasOwnProperty("increase")) {
+                        this.itemList[item][prop] += val["increase"];
+                    } else if (val.hasOwnProperty("decrease")) {
+                        this.itemList[item][prop] -= val["decrease"];
+                    }
+                } else if (this.rooms.hasOwn(item)) {
+                    if (val.hasOwnProperty("set")) {
+                        this.rooms[item][prop] = val["set"];
+                    } else if (val.hasOwnProperty("increase")) {
+                        this.rooms[item][prop] += val["increase"];
+                    } else if (val.hasOwnProperty("decrease")) {
+                        this.rooms[item][prop] -= val["decrease"];
+                    }
                 }
             }
         }

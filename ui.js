@@ -48,7 +48,6 @@ class UI {
         compiledText += '</p>';
 
         this.outputDiv.innerHTML += compiledText;
-        this.outputDiv.parentNode.scrollTop = this.outputDiv.parentNode.scrollHeight;
     }
 
     printlist(items) {
@@ -70,6 +69,12 @@ class UI {
     printrandom(phrases) {
         let phrase = phrases[Math.floor(Math.random() * phrases.length)];
         this.println(phrase);
+    }
+
+    scrollTo()
+    {
+        this.outputDiv.parentNode.scrollTop = this.outputDiv.parentNode.scrollHeight;
+
     }
 }
 

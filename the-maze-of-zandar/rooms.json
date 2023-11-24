@@ -1,7 +1,13 @@
 {
   "courtyard": {
     "oneShot": [
-      "You reflect on your long and arduous journey as you kick over the ashes of your campfire. A chance meeting in a tavern with a wandering stranger, idle talk of the great sorcerer Zandar and his labrynthian fortress filled with traps, foes, and treasure. At it's heart, a prize beyond reckoning, a single wish, crystalized and made form. Anything the mind could concieve or the heart could dream waiting for the one brave and clever enough to claim it."
+      "The taste of copper fills your mouth, your lungs protesting as you draw in ragged, heaving breaths. You sprint at breakneck pace across the huge wooden drawbridge towards the vast fortress. Behind you the thunderous sounds of a dozen horse's hooves and the battle cries of their goblin riders grow ever louder as the close in. The roar is accompanied by the deadly staccatto beat of arrowheads which thud into the floor at your feet or skitter against the grey stone walls of the fortress.",
+      "",
+      "You plunge through the doorway and into the the corridor between the outer portcullis and the inner courtyard. On your right you spot a large, heavy lever and you adjust your trajectory to intercept it, dropping to your knees you grasp it in both hands as you slide along the floor, dragging it with you. You feel the ancient lever click into place followed by a cacophany as heavy chains begin to unspool from their winches. With an ear-splitting explosion of metal, dust, and chunks of rock, the castle portcullis crashes into place behind you, heaving up the drawbridge as it falls, cutting you off from your pursuers. You collapse onto your back swallowing huge gulps of air and trying not to vomit from the exersion as a hail of arrows clatters ineffectually against the huge outer walls.",
+      "",
+      "You sit for a while, catching your breath and listening as the sound of the goblins fades away into the chilly evening air. You do not know if they have given up the chase or are trying to find another way in but, for now, you are safe. You check yourself for injuries and, barring a couple of nicks in your leather armour and a nasty gash on your cheek, you find you are surprisingly unpunctured. You make your way to the courtyard ahead and your heart pounds in your chest. Years of work have brought you to this point, to this place. You have sacrificed everything to be here. Family, friendship, lovers, all for the pursuit of this one goal, this myth.",
+      "",
+      "You make your way to the courtyard. The place is very old. The ground is littered with years of detritus, broken pieces of architecture are scattered around, covered with moss and creeping vines. Weeds have grown through the cracks, pushing up the paving slabs and breaking through the walls."
     ],
     "oneShotPlayed": false,
     "description": [
@@ -10,37 +16,20 @@
     "exits": [
       {
         "name": "NORTH",
-        "door": "iron_door",
+        "door": "courtyard_iron_door",
         "destination": "room002",
         "description": "The yawing mouth of the maze is before you. The air as black an thick as tar."
-      },
-      {
-        "name": "SOUTH",
-        "locked": false,
-        "destination": "room003",
-        "description": "Behind you, to the south, are rolling fields and the way back home."
       }
     ]
   },
   "room002": {
+    "oneShot": [
+      "The huge doors begin to swing back inwards as you step through, forcing you to sprint through the gap. They close with an ear-splitting clang, and you hear the locking mechanism's mechanical clicks as it slides back into place. There is no keyhole on this side of the door. The only way out is to press on deeper into the maze."
+    ],
     "description": [
-      "You have escaped Zandar's wrath!"
+      "You are at the start of a long corridor. Everything is made from the same grey stone as the exterior. The air is ice cold and damp and smells of rot and mould. The vaulted ceiling retreats away from you into the gloom. You can hear skittering and inhuman noises echoing from deep in the dark."
       ],
     "roomInventory": [],
     "exits": []
-  },
-  "room003": {
-    "description": [
-      "You turn to face the setting sun, your fight will wait for another day."
-    ],
-    "roomInventory": [],
-    "exits": [
-      {
-        "name": "NORTH",
-        "destination": "room001",
-        "description": "To the north of you is the intimidating castle zanbar.",
-        "locked": false
-      }
-    ]
   }
 }
