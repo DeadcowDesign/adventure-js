@@ -10,7 +10,16 @@ class Adventure {
         this.playerFile = "";
         // Most important - name of the game folder!
         this.gameName = gameName;
+        this.defaultGameName = gameName;
 
+        if (this.getLastPlayed() === null) {
+            this.gameName = gameName;
+        } else {
+            this.gameName = this.getLastPlayed();
+        }
+
+        this.saveLastPlayed(this.gameName);
+        
         this.rooms = {}; // The object that will hold the room data.
         this.itemList = {};  // The object that will hold the items.
         this.gameMeta = {}; // The object that will hold the game metadata.
@@ -45,7 +54,16 @@ class Adventure {
 
         // Get all the game data from the game folder (specified above).
         fetch(this.roomFile)
-            .then((response) => response.json())
+            .then((response) => {
+                console.log(response);
+                if (response.ok) {
+                    return response.json();
+                }
+
+                this.ui.println("Couldn't find the game file. Try loading another game.");
+                this.saveLastPlayed('default');
+                //this.main();
+            })
             .then((json) => {
                 if (this.rooms == null) {
                     this.rooms = json;
@@ -125,7 +143,7 @@ class Adventure {
     processCommand(rawCommand) {
         rawCommand = rawCommand.toUpperCase();
 
-        this.ui.println([rawCommand]);
+        //this.ui.println([rawCommand]);
         this.parser.tokenizeCommand(rawCommand);
  
         let command = this.parser.getCommand().toLowerCase();
@@ -299,7 +317,7 @@ class Adventure {
 
             } else {
 
-                if (!this.getInventorySpace === -1) {
+                if (this.getInventorySpace() === -1) {
                     this.itemList[itemId].location = "playerInventory";
                 } else if (this.getInventorySpace() > 0) {
                     if (this.itemList[itemId].take?.description) {
@@ -391,11 +409,9 @@ class Adventure {
 
     use(subjects) {
 
-        console.log(subjects);
 
         let object = this.getItemIdByName(subjects[0]);
         
-        console.log(object);
         // If there is no subject, then we use the object as the subject (e.g. "USE DOOR")
         // and we use the subject on itself (if available).
         let subject = !subjects[1] ? subjects[0] : subjects[1];
@@ -474,6 +490,7 @@ class Adventure {
     
         this.gameName = game[0].toLowerCase();
         this.gameName = this.gameName.replace(/\s/g, "-");
+        this.saveLastPlayed(this.gameName);
         this.main();
     }
 
@@ -522,6 +539,14 @@ class Adventure {
         }
 
         this.theme(theme);
+    }
+
+    saveLastPlayed(gamename) {
+        localStorage.setItem('lastPlayed', gamename);
+    }
+
+    getLastPlayed() {
+        return localStorage.getItem('lastPlayed');
     }
 
     updatePlayerStatusBar() {

@@ -166,6 +166,7 @@ body.modern {
     --glow: rgba(var(--white));
     --color: rgba(var(--white));
     font-weight: 300;
+    --cursor-image: none;
 }  
 
 body.fantasy {

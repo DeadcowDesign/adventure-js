@@ -74,6 +74,14 @@
                             "A pile of mossy bones lies scattered where a skeleton once lay."
                         ]
                     }
+                },
+                "courtyard_key": {
+                    "lookDescription": {
+                            "set": [
+                                "A heavy iron key, it's surface is pitted and ancient. It seems intricate beyond the capabilities of the material.",
+                                "Brown stains that look like smeared blood are caked on the surface. This item has a storied history."
+                            ]
+                    }
                 }
             }
         },

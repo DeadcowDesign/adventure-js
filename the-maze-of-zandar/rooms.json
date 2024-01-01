@@ -26,6 +26,7 @@
     "oneShot": [
       "The huge doors begin to swing back inwards as you step through, forcing you to sprint through the gap. They close with an ear-splitting clang, and you hear the locking mechanism's mechanical clicks as it slides back into place. There is no keyhole on this side of the door. The only way out is to press on deeper into the maze."
     ],
+    "oneShotPlayed": false,
     "description": [
       "You are at the start of a long corridor. Everything is made from the same grey stone as the exterior. The air is ice cold and damp and smells of rot and mould. The vaulted ceiling retreats away from you into the gloom. You can hear skittering and inhuman noises echoing from deep in the dark."
       ],

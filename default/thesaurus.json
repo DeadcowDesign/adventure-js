@@ -1,0 +1,16 @@
+{
+    "verbs": {
+        "LOAD": {
+            "synonyms": ["LOAD"]
+        },
+        "HELP": {
+            "synonyms": ["HELP"]
+        },
+        "RESET": {
+            "synonyms": ["RESET"]
+        },
+        "THEME": {
+            "synonyms": ["THEME"]
+        }
+    }
+}

@@ -1,22 +1,16 @@
 {
     "title": "Adventure Game System",
     "startingRoom": "room001",
-    "verbs": {
-        "GO": "go",
-        "SAY": "go",
-        "MOVE": "go",
-        "TRAVEL": "go",
-        "WALK": "go",
-        "OPEN": "use",
-        "USE": "use",
-        "LOOK": "look",
-        "EXAMINE": "look",
-        "INSPECT": "look",
-        "TAKE": "take",
-        "GET": "take",
-        "GRAB": "take",
-        "DROP": "drop",
-        "INVENTORY": "inventory",
-        "LOAD": "load"
-    }
+    "helpText": [
+        "To play the game, enter commands into the input box at the bottom of the screen.",
+        "Commands are two to four words, 'GO NORTH' or 'LOOK STATUE' or 'USE ROPE ON BUCKET'",
+        "The names of objects and directions you can interact with are in quotation marks.",
+        "List of commands:",
+        "Load: Load a game. Available games are Maze Of Zandar"
+    ],
+    "themes": [
+        "fantasy",
+        "modern",
+        "greenscreen"
+    ]
 }

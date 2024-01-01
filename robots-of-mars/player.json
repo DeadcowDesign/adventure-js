@@ -1,3 +1,4 @@
 {
-    "currentRoom": "room001"
+    "currentRoom": "room001",
+    "inventoryLimit": -1
 }

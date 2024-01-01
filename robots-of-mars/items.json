@@ -1,5 +1,5 @@
 {
-  "loaf_of_bread": {
+  "anal_probe": {
     "name": "anal probe",
     "location": "room001",
     "description": [
@@ -10,6 +10,17 @@
     "useDescription": "",
     "isActive": true,
     "isGrabbable": true,
-    "used": false
+    "used": false,
+    "use": {
+      "subject": "anal_probe",
+      "description": [
+        "It's too shiny. You just can't help yourself. You push the probe into your backside with two fingers.",
+        "It feels magnificent as it slides up there, smooth, warm, and vibrating slightly, you push it all the way in, deep inside yourself.",
+        "",
+        "Suddenly there is a click and a searing pain in your bowels as the probe shoots hooks into your rear. You now have an anal probe in you. Possibly forever",
+        "You consider the error of your ways and vow never to stuff unknown objects into your pipe."
+      ],
+      "mutations": {}
+    }
   }
 }
