@@ -1,4 +1,22 @@
 {
     "title": "Adventure Game System",
-    "startingRoom": "room001"
+    "startingRoom": "room001",
+    "verbs": {
+        "GO": "go",
+        "SAY": "go",
+        "MOVE": "go",
+        "TRAVEL": "go",
+        "WALK": "go",
+        "OPEN": "use",
+        "USE": "use",
+        "LOOK": "look",
+        "EXAMINE": "look",
+        "INSPECT": "look",
+        "TAKE": "take",
+        "GET": "take",
+        "GRAB": "take",
+        "DROP": "drop",
+        "INVENTORY": "inventory",
+        "LOAD": "load"
+    }
 }

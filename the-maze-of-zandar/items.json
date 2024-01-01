@@ -2,7 +2,8 @@
     "courtyard_statue": {
         "name": "STATUE",
         "location": "courtyard",
-        "description": [
+        "description": "A statue of the wizard Zandar towers over you in the centre of the courtyard.",
+        "lookDescription": [
             "The huge statue of Zandar must measure ten meters tall at least, his arms splayed wide, gown blowing in an eternal gale, staff in one hand, open grimoire in the other, as he shouts to the heavens. He is an imposing figure, slight though he is, with sharp features and a long, narrow beard that reaches down to his sternum.",
             "",
             "Time has buffeted the statue, it's surfaces are thick with moss, vines climbing its cracked exterior"
@@ -15,7 +16,7 @@
     "courtyard_iron_door": {
         "name": "IRON DOOR",
         "location": "courtyard",
-        "description": "A heavy 'iron door' with an intricate keyhole blocks your path to the 'NORTH'.",
+        "description": "An iron door with an intricate keyhole blocks your path to the north.",
         "isGrabbable": false,
         "isDoor": true,
         "isActive": true,
@@ -24,10 +25,11 @@
     "courtyard_skeleton": {
         "name": "SKELETON",
         "location": "courtyard",
-        "description": [
+        "description": "A skeleton is slumped against the base of a statue.",
+        "lookDescription": [
             "The skeleton lies slumped against the base of the statue. It is ancient and yellowed, moss clinging to the bones. Shreds of clothing, bleached by the sun, flutter in the breeze.",
             "Rotten arrows are still buried in it's ribcage, a cleft hewn in the top of its skull tells of this adventurer's demise. You wonder if this is also the fate that awaits you?",
-            "The skeleton's fleshless fingers are wrapped around what appears to be a 'key'. It is large and heavy with an incredibly intricate tip."
+            "The skeleton's fleshless fingers are wrapped around what appears to be a 'iron key'. It is large and heavy with an incredibly intricate tip."
         ],
         "isGrabbable": false,
         "isActive": true,
@@ -47,9 +49,10 @@
     "courtyard_key": {
         "name": "IRON KEY",
         "location": "courtyard",
-        "description": [
-            "An ancient, rusty, key. It's surface is worn and pitted. There seems to be dried blood smeared on the handle."
+        "lookDescription": [
+            "An iron key, ancient and rusty is wrapped in the skeleton's hand. It's surface is worn and pitted. There seems to be dried blood smeared on the handle."
         ],
+        "description": "An iron key is clenched in the skeleton's bony fingers.",
         "isGrabbable": false,
         "destroyOnUse": true,
         "used": false,
@@ -61,23 +64,30 @@
             ],
             "mutations": {
                 "courtyard_skeleton": {
-                    "isActive": {
-                        "set": false
+                    "lookDescription": {
+                        "set": [
+                            "A pile of mossy bones lies scattered where this adventurer once lay."
+                        ]
+                    },
+                    "description": {
+                        "set": [
+                            "A pile of mossy bones lies scattered where a skeleton once lay."
+                        ]
                     }
                 }
             }
-        }
-    },
-    "use": {
-        "subject": "courtyard_iron_door",
-        "description": [
-            "You push the key into the lock and turn it. Within the bowels of the labryinth you can hear ancient mechanisms creak into life.",
-            "With a screech like nails down a blackboard the heavy iron door slowly swings open."
-        ],
-        "mutations": {
-            "courtyard_iron_door": {
-                "isActive": {
-                    "set": false
+        },
+        "use": {
+            "subject": "courtyard_iron_door",
+            "description": [
+                "You push the key into the lock and turn it. Within the bowels of the labryinth you can hear ancient mechanisms creak into life.",
+                "With a screech like nails down a blackboard the heavy iron door slowly swings open."
+            ],
+            "mutations": {
+                "courtyard_iron_door": {
+                    "isActive": {
+                        "set": false
+                    }
                 }
             }
         }

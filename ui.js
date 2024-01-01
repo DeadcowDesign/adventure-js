@@ -48,6 +48,7 @@ class UI {
         compiledText += '</p>';
 
         this.outputDiv.innerHTML += compiledText;
+        this.scrollToBottom();
     }
 
     printlist(items) {
@@ -58,7 +59,7 @@ class UI {
         outputText += '</ul>';
 
         this.outputDiv.innerHTML += outputText;
-        this.outputDiv.parentNode.scrollTop = this.outputDiv.parentNode.scrollHeight;
+        this.scrollToBottom();
 
     }
 
@@ -71,7 +72,7 @@ class UI {
         this.println(phrase);
     }
 
-    scrollTo()
+    scrollToBottom()
     {
         this.outputDiv.parentNode.scrollTop = this.outputDiv.parentNode.scrollHeight;
 

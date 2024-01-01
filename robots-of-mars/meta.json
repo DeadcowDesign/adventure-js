@@ -1,5 +1,6 @@
 {
-    "title": "The Maze Of Zandar",
+    "title": "Robots Of Mars",
+    "startingRoom": "room001",
     "helpText": [
         "To play the game, enter commands into the input box at the bottom of the screen.",
         "Commands are two to four words, 'GO NORTH' or 'LOOK STATUE' or 'USE ROPE ON BUCKET'",

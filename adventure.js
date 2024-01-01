@@ -1,4 +1,5 @@
 import { UI } from './ui.js';
+import { Parser } from './parser.js';
 
 class Adventure {
     constructor(gameName, inputBarId, outputDivId, titleId, statusBarId) {
@@ -17,22 +18,10 @@ class Adventure {
 
         this.commandArray = [];  // The array of commands from the UI.
 
-        // Dictionary definitions for valid command words
-        this.verbs = [
-            "GO",
-            "TAKE",
-            "DROP",
-            "INVENTORY",
-            "USE",
-            "LOOK",
-            "ON",
-            "WITH",
-            "FROM",
-            "LOAD",
-        ];
 
         this.ui = new UI(inputBarId, outputDivId, titleId, statusBarId);
-
+        this.parser = new Parser(this.gameName);
+        
         window.addEventListener("inputupdate", (ev) => {
             this.processCommand(ev.detail);
         });
@@ -75,12 +64,25 @@ class Adventure {
                                 }
                                 fetch(this.playerFile)
                                     .then((response) => response.json())
-                                    .then((json) => {
+                                    .then(async (json) => {
                                         if (this.player == null) {
                                             this.player = json;
                                         }
-                                        // This is where we do the thing.
-                                        this.configureGame();
+                                        
+                                        let itemList = [];
+
+                                        for (let item of Object.entries(this.itemList)) {
+                                            itemList.push(item.name);
+                                        };
+
+                                        for (let item of Object.entries(this.rooms)) {
+                                            itemList.push(item.name);
+                                        };
+
+                                        await this.parser.loadThesaurus();
+                                            
+                                                // This is where we do the thing.
+                                                this.configureGame();
                                     })
                             })
                     })
@@ -96,9 +98,11 @@ class Adventure {
      */
     configureGame() {
 
+        this.loadTheme();
         this.ui.setTitle(this.gameMeta.title);
         this.updatePlayerStatusBar();
         this.describeRoom();
+        //this.parser.getCommand("GO");
     }
 
     saveGameData() {
@@ -107,6 +111,11 @@ class Adventure {
         localStorage.setItem(this.gameName + '-player', JSON.stringify(this.player));
     }
 
+    deleteGameData() {
+        localStorage.removeItem(this.gameName + '-rooms');
+        localStorage.removeItem(this.gameName + '-items');
+        localStorage.removeItem(this.gameName + '-player');
+    }
     /**
      * processCommand - runs on inputupdate (from the UI, when the player
      * submits the form). This is really the main game loop:
@@ -117,55 +126,11 @@ class Adventure {
         rawCommand = rawCommand.toUpperCase();
 
         this.ui.println([rawCommand]);
-        this.tokenizeCommand(rawCommand);
-
-        if (!this.gameMeta.verbs[this.commandArray[0]]) {
-            this.ui.println("I don't understand. Try something else, or use help.");
-        } else {
-            this[this.gameMeta.verbs[this.commandArray[0]]]();
-        }
-    }
-
-    /**
-     * tokenizeCommand - splits a space-separated string out into parts
-     * and processes them into an array. If an item is not a verb it is
-     * concatenated until we hit a verb, then that string is added to the
-     * array, and the verb is added after. Loops until we run out of words.
-     * @param {string} command The string to be tokenized
-     */
-    tokenizeCommand(command) {
-        this.commandArray = []; // Don't forget to clean.
-        let commandParts = command.split(" ");
-        let verbString = "";
-        let processing = true;
-
-        // First word should always be a command verb.
-        this.commandArray.push(commandParts.shift());
-
-        while (processing === true) {
-
-            let token = commandParts.shift();
-            if (this.verbs.indexOf(token) === -1) {
-
-                verbString += " " + token;
-
-            } else {
-
-                this.commandArray.push(verbString.trim());
-                verbString = "";
-                this.commandArray.push(token);
-            }
-
-            if (!commandParts.length) {
-
-                if (verbString.length) {
-
-                    this.commandArray.push(verbString.trim());
-                }
-
-                processing = false;
-            }
-        }
+        this.parser.tokenizeCommand(rawCommand);
+ 
+        let command = this.parser.getCommand().toLowerCase();
+        let params = this.parser.getParams();
+        this[command](params);
     }
 
     describeRoom() {
@@ -196,15 +161,10 @@ class Adventure {
         let roomItems = this.getRoomInventory();
 
         if (roomItems.length) {
-            this.ui.println(["You can see:"]);
-
-            let itemNames = [];
 
             roomItems.forEach(item => {
-                itemNames.push(item);
+                this.ui.println(item.description);
             });
-
-            this.ui.printlist(itemNames);
         }
 
     }
@@ -224,7 +184,8 @@ class Adventure {
 
     getItemIdByName(targetItem) {
         for (let [id, item] of Object.entries(this.itemList)) {
-            if (item.name === targetItem) {
+
+            if (item.name.toLowerCase() === targetItem.toLowerCase()) {
                 if (item.isActive) {
                     return id;
                 }
@@ -239,7 +200,7 @@ class Adventure {
 
         for (let [index, item] of Object.entries(this.itemList)) {
             if (item.location === this.player.currentRoom && !item.isDoor && item.isActive) {
-                roomInventory.push(item.name);
+                roomInventory.push(item);
             }
         }
 
@@ -279,8 +240,8 @@ class Adventure {
     /******************
      * GAME FUNCTIONS *
      ******************/
-    go() {
-        let direction = this.commandArray[1];
+    go(directions) {
+        let direction = directions[0];
         let foundRoom = false;
 
         this.rooms[this.player.currentRoom].exits.forEach((exit) => {
@@ -316,11 +277,11 @@ class Adventure {
         ]);
     }
 
-    take() {
-        let takeTarget = this.commandArray[1];
+    take(takeTargets) {
+        let takeTarget = takeTargets[0];
         let itemId = this.getItemIdByName(takeTarget);
 
-        if (this.itemList[itemId] && this.itemList[itemId].location == this.player.currentRoom) {
+        if (itemId !== "" && this.itemList[itemId].location == this.player.currentRoom) {
 
             if (!this.itemList[itemId].isGrabbable) {
 
@@ -353,7 +314,6 @@ class Adventure {
                 }
 
             }
-
             if (this.itemList[itemId].take?.mutations) {
                 this.doMutations(this.itemList[itemId].take.mutations);
             }
@@ -367,8 +327,8 @@ class Adventure {
         }
     }
 
-    drop() {
-        let dropTarget = this.commandArray[1];
+    drop(dropTargets) {
+        let dropTarget = dropTargets[0];
         let itemId = this.getItemIdByName(dropTarget);
 
         if (this.itemList[itemId] && this.itemList[itemId].location == "playerInventory") {
@@ -379,13 +339,13 @@ class Adventure {
         }
     }
 
-    look() {
-        if (this.commandArray[1] == 'undefined' || typeof (this.commandArray[1]) == null) {
+    look(targetItems) {
+        if (targetItems[0] == 'undefined' || typeof (targetItems[0]) == null) {
             this.describeRoom();
             return;
         }
 
-        let exit = this.getRoomExitsByName(this.commandArray[1]);
+        let exit = this.getRoomExitsByName(targetItems[0]);
 
         if (exit) {
 
@@ -394,11 +354,16 @@ class Adventure {
         }
 
 
-        let target = this.getItemIdByName(this.commandArray[1]);
+        let target = this.getItemIdByName(targetItems[0]);
 
         if (target && (this.itemList[target].location == this.player.currentRoom || this.itemList[target].location == "playerInventory")) {
-            this.ui.println(this.itemList[target].description);
-            this.ui.scrollTo();
+            if (this.itemList[target].hasOwnProperty("lookDescription")) {
+                this.ui.println(this.itemList[target].lookDescription);
+            } else {
+                this.ui.println(this.itemList[target].description);
+            }
+
+            //this.ui.scrollTo();
             if (this.itemList[target].look?.mutations) {
                 this.doMutations(this.itemList[target].look.mutations);
                 this.saveGameData();
@@ -409,7 +374,6 @@ class Adventure {
 
         return;
     }
-
 
     help() {
         this.ui.println(this.gameMeta.helpText);
@@ -425,22 +389,22 @@ class Adventure {
         }
     }
 
-    use() {
-        /* 
-            Check if the user has supplied an 'on' and a 'subject' - e.g.
-            "use key on door"
-            TODO - Tidy this up and check for valid use nouns ('on', 'with' etc)
-        */
+    use(subjects) {
 
-        let object = this.getItemIdByName(this.commandArray[1]);
+        console.log(subjects);
 
+        let object = this.getItemIdByName(subjects[0]);
+        
+        console.log(object);
         // If there is no subject, then we use the object as the subject (e.g. "USE DOOR")
         // and we use the subject on itself (if available).
-        let subject = !this.commandArray[3] ? this.commandArray[1] : this.commandArray[3];
+        let subject = !subjects[1] ? subjects[0] : subjects[1];
+
+        console.log(subject);
 
         if (subject !== "PLAYER") {
 
-            subject = this.getItemIdByName(this.commandArray[3]);
+            subject = this.getItemIdByName(subject);
 
         } else {
 
@@ -506,14 +470,58 @@ class Adventure {
         this.saveGameData();
     }
 
-    load() {
-        if (this.commandArray[1] == 'undefined' || typeof (this.commandArray[1]) == null) {
-            return false;
-        } else {
-            this.gameName = this.commandArray[1].toLowerCase();
-            this.gameName = this.gameName.replace(/\s/g, "-");
-            this.main();
+    load(game) {
+    
+        this.gameName = game[0].toLowerCase();
+        this.gameName = this.gameName.replace(/\s/g, "-");
+        this.main();
+    }
+
+    reset() {
+        this.deleteGameData();
+        this.main();
+    }
+
+    theme(theme) {
+        
+        if (Array.isArray(theme)) {
+            theme = theme[0];
         }
+
+        if (!this.gameMeta.hasOwnProperty('themes')) {
+            return false;
+        }
+
+        if (!this.gameMeta.themes.includes(theme.toLowerCase())) {
+            this.ui.println(["Theme not found.", "The following themes are available:"]);
+            this.gameMeta.themes.forEach((theme) => {
+                this.ui.println(theme);
+            });
+
+            return false;
+
+        }
+
+        document.body.className = "";
+        document.body.className = theme.toLowerCase();
+        this.saveTheme(theme);
+    }
+
+    saveTheme(theme) {
+        localStorage.setItem('theme', theme);
+    }
+
+    loadTheme() {
+
+        let theme = 'greenscreen';
+
+        if (localStorage.getItem('theme') === null) {
+            this.saveTheme(theme);
+        } else {
+            theme = localStorage.getItem('theme');
+        }
+
+        this.theme(theme);
     }
 
     updatePlayerStatusBar() {
@@ -535,9 +543,11 @@ class Adventure {
     }
 
     doMutations(mutationList) {
+
         for (let [item, mutations] of Object.entries(mutationList)) {
             for (let [prop, val] of Object.entries(mutations)) {
-                if (this.itemList.hasOwn(item)) {
+                console.log(prop);
+                if (this.itemList.hasOwnProperty(item)) {
                     if (val.hasOwnProperty("set")) {
                         this.itemList[item][prop] = val["set"];
                     } else if (val.hasOwnProperty("increase")) {
@@ -545,7 +555,7 @@ class Adventure {
                     } else if (val.hasOwnProperty("decrease")) {
                         this.itemList[item][prop] -= val["decrease"];
                     }
-                } else if (this.rooms.hasOwn(item)) {
+                } else if (this.rooms.hasOwnProperty(item)) {
                     if (val.hasOwnProperty("set")) {
                         this.rooms[item][prop] = val["set"];
                     } else if (val.hasOwnProperty("increase")) {

@@ -1,0 +1,15 @@
+{
+  "loaf_of_bread": {
+    "name": "anal probe",
+    "location": "room001",
+    "description": [
+      "An anal probe."
+    ],
+    "lookDescription": ["A shiny cylinder with a smooth tip, it has pink lights running up the side which pulsate. Small holes seem to indicate that this device is self-lubricating.",
+    "It seems to call a siren song to your rectum."],
+    "useDescription": "",
+    "isActive": true,
+    "isGrabbable": true,
+    "used": false
+  }
+}

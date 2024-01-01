@@ -1,0 +1,35 @@
+{
+    "verbs": {
+        "GO": {
+            "synonyms":["GO", "TRAVEL", "WALK"]
+        },
+        "TAKE": {
+            "synonyms": ["TAKE", "GET", "PICK"]
+        },
+        "DROP": {
+            "synonyms": ["DROP"]
+        },
+        "USE": {
+            "synonyms": ["USE"],
+            "prepositions": ["WITH", "ON"]
+        },
+        "LOAD": {
+            "synonyms": ["LOAD"]
+        },
+        "LOOK": {
+            "synonyms": ["LOOK", "EXAMINE"]
+        },
+        "INVENTORY": {
+            "synonyms": ["INVENTORY"]
+        },
+        "HELP": {
+            "synonyms": ["HELP"]
+        },
+        "RESET": {
+            "synonyms": ["RESET"]
+        },
+        "THEME": {
+            "synonyms": ["THEME"]
+        }
+    }
+}

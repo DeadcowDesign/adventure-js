@@ -1,7 +1,7 @@
 @font-face { font-family: VT323; src: url('Glass_TTY_VT220.ttf'); }
+@import url('https://fonts.googleapis.com/css2?family=Uncial+Antiqua&display=swap');
 
 :root {
-    --font: "VT323", monospace;
     --white: 255, 255, 255;
     --amber: 255, 176, 0;
     --lt-amber: 255, 204, 0;
@@ -12,7 +12,6 @@
     --green-3: 0, 255, 102;
     --blue: 0,70,255;
     --red: 255,95,0;
-    --old-ink: 64, 18, 0, 0.8;
     --glass: 73,82,71;
     --background: rgb(var(--glass));
     --phosphor: rgb(var(--green-2));
@@ -27,7 +26,7 @@
     --cursor-green-3: url('cursor-green-3.png');
     --cursor-apple-ii: url('cursor-apple-ii.png');
     --cursor-apple-iic: url('cursor-apple-iic.png');
-    --cursor-fantasy: url('images/cursor-fantasy.png');
+
     --cursor-image: var(--cursor-green-2);
 
     --standard-size: 24px;
@@ -46,13 +45,12 @@
     box-sizing: border-box;
     font-size: var(--standard-size);
     font-weight: normal;
-    color: var(--phosphor);
+    color: rgb(var(--white));
     line-height: 1.25;
     margin: 0;
     padding: 0;
     -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    
+    -moz-osx-font-smoothing: grayscale;    
 }
 
 .small {
@@ -64,13 +62,13 @@ pre.no-space:first-of-type {
 }
 
 pre.no-space {
-    line-height: 1;
+    line-height: 1.5;
 }
 
-
-body.glow .terminal > * {
-    filter: drop-shadow(0px 0px 5px var(--glow));
-}
+body.modern {
+    --phosphor: rgb(var -- white);
+    --glow: (rgba(0,0,0,0));
+}   
 
 body {
     cursor: var(--cursor-image), auto;
@@ -79,116 +77,21 @@ body {
     
     margin: 0;
     background-color: var(--background);
-    color: var(--phosphor);
+    color: var(--white);
     border-color: var(--phosphor);
-    font-family: var(--font);
+    font-family: 'Urbanist', sans-serif;
     /*caret-color: transparent;*/
-    caret: var(--phosphor) block;
+    caret: var(--white) block;
     background: black;
     border-radius: 20%;
 }
 
 body.background {
-    background: radial-gradient(farthest-corner at 40px 40px, rgba(73,82,71,1) 0%, rgba(3,4,2,1) 100%);
+    background: rgba(3,4,2,1);
 }
 body > *.invert {
     background-color: var(--phosphor);
     color: var(--background);
-}
-
-pre {
-    font-family: 'VT323', monospace;
-}
-
-body.amber {
-    --phosphor: rgb(var(--amber));
-    --glow: rgba(var(--amber), 0.5);
-    --cursor-image: var(--cursor-amber);
-    
-}
-
-body.lt-amber {
-    --phosphor: rgb(var(--lt-amber));
-    --glow: rgba(var(--lt-amber), 0.5);
-    --cursor-image: var(--cursor-lt-amber);
-}
-
-body.green-1 {
-    --phosphor: rgb(var(--green-1));
-    --glow: rgba(var(--green-1), 0.5);
-    --cursor-image: var(--cursor-green-1);
-    background: radial-gradient(farthest-corner at 40px 40px, rgba(73,82,71,1) 0%, rgba(3,4,2,1) 100%);
-}
-
-body.green-2 {
-    --phosphor: rgb(var(--green-2));
-    --glow: rgba(var(--green-2), 0.5);
-    --cursor-image: var(--cursor-green-2);
-}
-
-body.green-3 {
-    --phosphor: rgb(var(--green-3));
-    --glow: rgba(var(--green-3), 0.5);
-    --cursor-image: var(--cursor-green-3);
-}
-
-body.apple-ii {
-    --phosphor: rgb(var(--apple-ii));
-    --glow: rgba(var(--apple-ii), 0.5);
-    --cursor-image: var(--cursor-apple-ii);
-}
-
-body.apple-iic {
-    --phosphor: rgb(var(--apple-iic));
-    --glow: rgba(var(--apple-iic), 0.5);
-    --cursor-image: var(--cursor-apple-iic);
-}
-
-body.white {
-    --phosphor: rgb(var(--white));
-    --glow: rgba(var(--white), 0.5);
-    --cursor-image: var(--cursor-white);
-}
-
-body.blue {
-    --phosphor: rgb(var(--blue));
-    --glow: rgba(var(--blue), 0.5);
-}
-
-body.red {
-    --phosphor: rgb(var(--red));
-    --glow: rgba(var(--red), 0.5);
-}
-
-body.modern {
-    --font: "Urbanist", sans-serif;
-    --phosphor: rgba(var(--white));
-    --glow: rgba(var(--white));
-    --color: rgba(var(--white));
-    font-weight: 300;
-}  
-
-body.fantasy {
-    --font: "Uncial Antiqua", serif;
-    --phosphor: rgba(var(--old-ink));
-    --glow: rgba(var(--white));
-    --color: rgba(var(--old-ink));
-    --cursor-image: var(--cursor-fantasy);
-
-    font-weight: 300;
-    background-image: url('images/fantasy-bg.jpg');
-    background-size: cover;
-}  
-
-body.greenscreen {
-    --phosphor: rgb(var(--green-1));
-    --glow: rgba(var(--green-1), 0.5);
-    --cursor-image: var(--cursor-green-1);
-    background: radial-gradient(farthest-corner at 40px 40px, rgba(73,82,71,1) 0%, rgba(3,4,2,1) 100%);
-}
-
-p {
-    margin-bottom: var(--standard-size);
 }
 
 h1 {
@@ -390,7 +293,7 @@ header .status-bar {
     outline: none;
     text-transform: uppercase;
     margin-left: 12px;
-    font-family: var(--font);
+    font-family: 'VT323', monospace;
     background-color: transparent;
     width: calc(100% - 12px);
     border: var(--border);
