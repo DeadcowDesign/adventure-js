@@ -34,16 +34,23 @@
         "isGrabbable": false,
         "isActive": true,
         "look": {
-            "mutations": {
-                "courtyard_key": {
-                    "isActive": {
-                        "set": true
-                    },
-                    "isGrabbable": {
-                        "set": true
-                    }
+            "mutations": [
+                {
+                    "target": "courtyard_key",
+                    "actions": [
+                        {
+                            "property": "isActive",
+                            "action": "set",
+                            "value": true
+                        },
+                        {
+                            "property": "isGrabbable",
+                            "action": "set",
+                            "value": true
+                        }
+                    ]
                 }
-            }
+            ]
         }
     },
     "courtyard_key": {
@@ -62,28 +69,36 @@
                 "You prize open the skeleton's fingers which requires a surprising amount of force as though, even in death, the cadaver remembers the importance of this item.",
                 "As you peel open the hand the skeleton crumbles as if finally defeated. You are left with nothing but the heavy iron key, which you place in your backpack"
             ],
-            "mutations": {
-                "courtyard_skeleton": {
-                    "lookDescription": {
-                        "set": [
-                            "A pile of mossy bones lies scattered where this adventurer once lay."
-                        ]
-                    },
-                    "description": {
-                        "set": [
-                            "A pile of mossy bones lies scattered where a skeleton once lay."
-                        ]
-                    }
+            "mutations": [
+                {
+                    "target": "courtyard_skeleton",
+                    "actions": [
+                        {
+                            "property": "lookDescription",
+                            "action": "set",
+                            "value": "A pile of mossy bones lies scattered where this adventurer once lay."
+                        },
+                        {
+                            "property": "description",
+                            "action": "set",
+                            "value": "A pile of mossy bones lies scattered where a skeleton once lay."
+                        }
+                    ]
                 },
-                "courtyard_key": {
-                    "lookDescription": {
-                            "set": [
+                {
+                    "target": "courtyard_key",
+                    "actions": [
+                        {
+                            "property": "lookDescription",
+                            "action": "set",
+                            "value": [
                                 "A heavy iron key, it's surface is pitted and ancient. It seems intricate beyond the capabilities of the material.",
                                 "Brown stains that look like smeared blood are caked on the surface. This item has a storied history."
                             ]
-                    }
+                        }
+                    ]
                 }
-            }
+            ]
         },
         "use": {
             "subject": "courtyard_iron_door",
@@ -91,13 +106,18 @@
                 "You push the key into the lock and turn it. Within the bowels of the labryinth you can hear ancient mechanisms creak into life.",
                 "With a screech like nails down a blackboard the heavy iron door slowly swings open."
             ],
-            "mutations": {
-                "courtyard_iron_door": {
-                    "isActive": {
-                        "set": false
-                    }
+            "mutations": [
+                {
+                    "target":"courtyard_iron_door",
+                    "actions": [ 
+                        {
+                            "property": "isActive",
+                            "action": "set",
+                            "value": false
+                        }
+                    ]
                 }
-            }
+            ]
         }
     }
 }

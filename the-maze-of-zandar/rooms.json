@@ -17,20 +17,28 @@
       {
         "name": "NORTH",
         "door": "courtyard_iron_door",
-        "destination": "room002",
+        "destination": "lever_puzzle_room",
         "description": "The yawing mouth of the maze is before you. The air as black an thick as tar."
       }
     ]
   },
-  "room002": {
+  "lever_puzzle_room": {
     "oneShot": [
-      "The huge doors begin to swing back inwards as you step through, forcing you to sprint through the gap. They close with an ear-splitting clang, and you hear the locking mechanism's mechanical clicks as it slides back into place. There is no keyhole on this side of the door. The only way out is to press on deeper into the maze."
+      "The huge doors begin to swing back inwards as you step through, forcing you to sprint through the gap. They close with an ear-splitting clang, and you hear the locking mechanism's mechanical clicks as it slides back into place. There is no keyhole on this side of the door. The only way out is to press on deeper into the maze.",
+      "Your eyes adjust to the dark, and you can see you are in a small entrance room. Opposite you is a gate. Pulling on the bars, you realize it is shut fast."
+    
     ],
     "oneShotPlayed": false,
     "description": [
-      "You are at the start of a long corridor. Everything is made from the same grey stone as the exterior. The air is ice cold and damp and smells of rot and mould. The vaulted ceiling retreats away from you into the gloom. You can hear skittering and inhuman noises echoing from deep in the dark."
+      "You are in a small, stone room with a grate blocking you to the north."
       ],
-    "roomInventory": [],
-    "exits": []
+      "exits": [
+        {
+          "name":"NORTH",
+          "door": "lever_puzzle_door",
+          "destination": "room03",
+          "description": "A corridor extends before you."
+        }
+      ]
   }
 }
