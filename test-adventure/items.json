@@ -1,0 +1,148 @@
+{
+    "test_condition": {
+        "name": "TEST CONDITION",
+        "location": "test_room_001",
+        "isActive": true,
+        "isGrabbable": false,
+        "description": ["Use tests on this TEST CONDITION and then use LOOK to view results messages.", "RESET after each test.", "By default LOOK should read 'This description is clean'."],
+        "lookDescription": "This description is clean.",
+        "testString": "TEST",
+        "testNum": 10
+    },
+
+    "test_string_pass": {
+        "name": "TEST EQUALS PASSES",
+        "location": "test_room_001",
+        "isActive": true,
+        "isGrabbable": false,
+        "description": "Do USE TEST EQUALS PASSES on TEST CONDITION.",
+        "use": {
+            "subject": "test_condition",
+            "description": ["Use LOOK TEST CONDITION which should have the message:",
+        "String equals passes"],
+            "mutations": [
+                {
+                    "target": "test_condition",
+                    "actions": [
+                        {
+                            "property": "lookDescription",
+                            "action": "set",
+                            "value": "String equals passes"
+                        }
+                    ],
+                    "conditions": [
+                        {
+                            "target": "test_condition",
+                            "property": "testString",
+                            "is": "equalTo",
+                            "value": "TEST",
+                            "failMessage": "TEST does not EQUAL FOO"
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+
+    "test_string_fail": {
+        "name": "TEST EQUALS FAILS",
+        "location": "test_room_001",
+        "isActive": true,
+        "isGrabbable": false,
+        "description": "Do USE TEST EQUALS FAILS ON TEST CONDITION.",
+        "use": {
+            "subject": "test_condition",
+            "description": ["Use LOOK TEST CONDITION which should have the message:",
+        "This description is clean"],
+            "mutations": [
+                {
+                    "target": "test_condition",
+                    "actions": [
+                        {
+                            "property": "lookDescription",
+                            "action": "set",
+                            "value": "String equals passes"
+                        }
+                    ],
+                    "conditions": [
+                        {
+                            "target": "test_condition",
+                            "property": "testString",
+                            "is": "equalTo",
+                            "value": "FOO",
+                            "failMessage": "TEST does not EQUAL FOO"
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+
+    "test_gt_pass": {
+        "name": "TEST GREATER THAN PASSES",
+        "location": "test_room_001",
+        "isActive": true,
+        "isGrabbable": false,
+        "description": "Do USE GREATER THAN PASSES on TEST CONDITION.",
+        "use": {
+            "subject": "test_condition",
+            "description": ["Use LOOK TEST CONDITION which should have the message:",
+        "Greater than passes"],
+            "mutations": [
+                {
+                    "target": "test_condition",
+                    "actions": [
+                        {
+                            "property": "lookDescription",
+                            "action": "set",
+                            "value": "Greater than passes"
+                        }
+                    ],
+                    "conditions": [
+                        {
+                            "target": "test_condition",
+                            "property": "testNum",
+                            "is": "greaterThan",
+                            "value": 5,
+                            "failMessage": "You should not see this failure message"
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+
+    "test_gt_fail": {
+        "name": "TEST GREATER THAN FAILS",
+        "location": "test_room_001",
+        "isActive": true,
+        "isGrabbable": false,
+        "description": "Do USE TEST GREATER THAN FAILS ON TEST CONDITION.",
+        "use": {
+            "subject": "test_condition",
+            "description": ["Use LOOK TEST CONDITION which should have the message:",
+        "This description is clean"],
+            "mutations": [
+                {
+                    "target": "test_condition",
+                    "actions": [
+                        {
+                            "property": "lookDescription",
+                            "action": "set",
+                            "value": "String equals passes"
+                        }
+                    ],
+                    "conditions": [
+                        {
+                            "target": "test_condition",
+                            "property": "testNum",
+                            "is": "greaterThan",
+                            "value": 15,
+                            "failMessage": "10 is not greater than 15"
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+}

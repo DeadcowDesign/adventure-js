@@ -1,0 +1,32 @@
+{
+  "test_room_001": {
+    "oneShot": [
+      "This is the one-shot for the first test room. This should only be seen once per fresh game."
+    ],
+    "oneShotPlayed": false,
+    "description": [
+      "This is a test room with test objects. Use this for testing conditions."
+    ],
+    "exits": [
+      {
+        "name": "NORTH",
+        "door": "courtyard_iron_door",
+        "destination": "lever_puzzle_room",
+        "description": "The yawing mouth of the maze is before you. The air as black an thick as tar."
+      }
+    ]
+  },
+  "lever_puzzle_room": {
+    "description": [
+      "You are in a small, stone room with a grate blocking you to the north."
+      ],
+      "exits": [
+        {
+          "name":"NORTH",
+          "door": "lever_puzzle_door",
+          "destination": "room03",
+          "description": "A corridor extends before you."
+        }
+      ]
+  }
+}

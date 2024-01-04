@@ -58,7 +58,6 @@ class Adventure {
         // Get all the game data from the game folder (specified above).
         fetch(this.roomFile)
             .then((response) => {
-                console.log(response);
                 if (response.ok) {
                     return response.json();
                 }
@@ -419,8 +418,6 @@ class Adventure {
         // and we use the subject on itself (if available).
         let subject = !subjects[1] ? subjects[0] : subjects[1];
 
-        console.log(subject);
-
         if (subject !== "PLAYER") {
 
             subject = this.getItemIdByName(subject);
@@ -438,10 +435,9 @@ class Adventure {
                 this.ui.println("You do not have that.")
                 return;
             }
+
             this.doMutations(this.itemList[object].use.mutations);
 
-
-            this.itemList[object].isActive = false;
             this.ui.println(this.itemList[object].use.description);
             this.saveGameData();
             this.updatePlayerStatusBar();
@@ -482,8 +478,6 @@ class Adventure {
 
 
         this.doMutations(this.itemList[object].use.mutations);
-
-        this.itemList[object].isActive = false;
 
         this.ui.println(this.itemList[object].use.description);
         this.saveGameData();
@@ -573,13 +567,29 @@ class Adventure {
     doMutations(mutationList) {
 
         mutationList.forEach((mutation) => {
-            console.log(mutation);
+
             if (!mutation.hasOwnProperty('target') || !this.itemList.hasOwnProperty(mutation.target) || !mutation.hasOwnProperty("actions")) {
                 console.error("Missing mutation prop");
                 return false;
             }
 
             if (!Array.isArray(mutation.actions)) return false;
+
+            if (mutation.hasOwnProperty("conditions")) {
+
+                let conditionsResult = true;
+
+                mutation.conditions.forEach((condition) => {
+
+                    if (this.doCondition(condition) === false) {
+                        conditionsResult = false;
+                    }
+                });
+
+                if (conditionsResult === false) {
+                    return false;
+                }
+            }
 
             mutation.actions.forEach((action) => {
                 if (!action.hasOwnProperty("property") 
@@ -589,28 +599,12 @@ class Adventure {
                     console.error("Missing action property");
                     return false;
                 }
-                
-                if (action.hasOwnProperty("conditions")) {
-
-                    conditionsResult = true;
-
-                    conditions.forEach((condition) => {
-
-                        if (this.doCondition(condition) === false) {
-                            conditionResult = false;
-                        }
-                    });
-
-                    if (conditionResult === false) {
-                        return false;
-                    }
-                }
 
                 switch(action.action) {
                     case ("add"):
                         this.itemList[mutation.target][action.property] += action.value;
                         break;
-                    case("sub"):
+                    case("subtract"):
                         this.itemList[mutation.target][action.property] -= action.value;
                         break;
                     default:
@@ -620,41 +614,48 @@ class Adventure {
         });
     }
 
-    doCondition(action)
+    doCondition(condition)
     {
-        if (!action.condition.hasOwnProperty("target") 
-            || !action.condition.hasOwnProperty("property") 
-            || !action.condition.hasOwnProperty("value") 
-            || !action.condition.hasOwnProperty("is"))
+        let hasPassed = false;
+
+        if (!condition.hasOwnProperty("target") 
+            || !condition.hasOwnProperty("property") 
+            || !condition.hasOwnProperty("value") 
+            || !condition.hasOwnProperty("is"))
         return false;
 
-        if (!this.itemList.hasOwnProperty(action.condition.target) 
-            || !(this.itemList[action.condition.target].hasOwnProperty(action.condition.property)))
+        if (!this.itemList.hasOwnProperty(condition.target) 
+            || !(this.itemList[condition.target].hasOwnProperty(condition.property)))
         return false;
 
-        hasPassed = false;
+        let targetProperty = this.itemList[condition.target][condition.property];
 
-        switch(action.condition.is) {
+        switch(condition.is) {
             case ("greaterThan"):
-                if (action.condition.value > this.itemList[action.condition.target][action.condition.property]) {
+                if (targetProperty > condition.value) {
                     hasPassed = true;
                 }
             break;
             case ("lessThan"):
-                if (action.condition.value < this.itemList[action.condition.target][action.condition.property]) {
+                if (targetProperty < condition.value) {
                     hasPassed = true;
                 }
             break;
             case ("equalTo"):
-                if (action.condition.value == this.itemList[action.condition.target][action.condition.property]) {
+                if (targetProperty == condition.value) {
+                    hasPassed = true;
+                }
+            break;
+            case ("notEqualTo"):
+                if (targetProperty == condition.value) {
                     hasPassed = true;
                 }
             break;
         }
 
         if (hasPassed === false) {
-            if (action.condition.hasOwnProperty("failMessage")) {
-                this.ui.println(action.condition.failMessage);
+            if (condition.hasOwnProperty("failMessage")) {
+                this.ui.println(condition.failMessage);
             } else {
                 this.ui.println(this.conditionFailMessage);
             }
